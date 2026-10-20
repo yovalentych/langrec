@@ -82,7 +82,9 @@ class SignalView(QWidget):
     # ------------------------------------------------------------- building
     def build(self, channels, filter_desc: list[list[str]], units_scale: list[float]):
         th = self.theme
-        pg.setConfigOptions(antialias=True, background=th.plot_bg, foreground=th.plot_fg)
+        # no antialiasing for the signal curves: with thousands of points per frame it costs
+        # far more than it shows (the trends below are small and stay antialiased)
+        pg.setConfigOptions(antialias=False, background=th.plot_bg, foreground=th.plot_fg)
         for w in (self.glw, self.trend_w):
             w.setBackground(th.plot_bg)
         self.glw.clear()
@@ -108,7 +110,8 @@ class SignalView(QWidget):
                 first = p
             else:
                 p.setXLink(first)
-            curve = p.plot(pen=pg.mkPen(col, width=1.5))
+            curve = p.plot(pen=pg.mkPen(col, width=1.2), antialias=False)
+            curve.setSkipFiniteCheck(True)
             idx = len(self.plots)
             p.getViewBox().sigRangeChangedManually.connect(lambda *_, k=idx: self._manual(k))
             self.plots.append(p)
@@ -139,8 +142,8 @@ class SignalView(QWidget):
             tp.getAxis("left").setWidth(48)
             tp.hideButtons()
             tp.setMenuEnabled(False)
-        self.tc_lvdp = self.tp_lvdp.plot(pen=pg.mkPen(th.channels[0], width=1.8))
-        self.tc_hr = self.tp_hr.plot(pen=pg.mkPen(th.channels[1], width=1.8))
+        self.tc_lvdp = self.tp_lvdp.plot(pen=pg.mkPen(th.channels[0], width=1.8), antialias=True)
+        self.tc_hr = self.tp_hr.plot(pen=pg.mkPen(th.channels[1], width=1.8), antialias=True)
 
     def _set_title(self, k: int):
         manual = "" if self.auto[k] else f"  <span style='color:{self.theme.warn}'>{tr('plot.manual')}</span>"
@@ -206,6 +209,10 @@ class SignalView(QWidget):
             right[level] = x_px + width + 6
             item.setVisible(True)
             item.setPos(x0 + x_px * sx, y1 - (4 + level * row + row / 2) * sy)
+
+    def repaint_now(self):
+        """Paint synchronously (so the caller can measure how long drawing takes)."""
+        self.glw.viewport().repaint()
 
     def update_trends(self, t, lvdp, hr):
         self.tc_lvdp.setData(t, lvdp, connect="finite")

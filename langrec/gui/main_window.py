@@ -18,6 +18,7 @@ docks and the centre (_build_ui); everything that must survive lives on `self`.
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import asdict, replace
 from pathlib import Path
 
@@ -153,6 +154,8 @@ class MainWindow(QMainWindow):
         self.rec_info: tuple[str, dict] = ("rec.info", {})
         self.window_idx = 1
         self._explain_tick = 0
+        self._last_draw = 0.0
+        self._draw_interval = 0.05   # adapted to how long drawing takes on this computer
         self._docks: list[QDockWidget] = []
         self._toolbar: QToolBar | None = None
 
@@ -1006,7 +1009,7 @@ class MainWindow(QMainWindow):
                 self._register_marker({"sample": ev.sample, "kind": ev.kind, "key": key,
                                        "params": ev.params, "text": ev.text})
             self._run_analysis()
-            self._refresh_plots()
+            self._draw()
         self._update_pos()
         self._update_clock()
         self._explain_tick += 1
@@ -1083,6 +1086,19 @@ class MainWindow(QMainWindow):
                 col = th.danger if d > 0.1 * abs(b.lvdp or 1) else th.muted
                 tile.delta.setText(tr("tile.abs", d=d))
             tile.delta.setStyleSheet(f"color:{col};")
+
+    def _draw(self):
+        """Redraw the plots, but never let drawing take more than ~1/3 of the time:
+        on a slow computer (or a large Retina screen) the plots refresh less often,
+        while data, analysis, recording and the controls stay responsive."""
+        now = time.perf_counter()
+        if now - self._last_draw < self._draw_interval:
+            return
+        self._refresh_plots()
+        self.view.repaint_now()
+        cost = time.perf_counter() - now
+        self._draw_interval = min(0.5, max(0.04, 3 * cost))
+        self._last_draw = time.perf_counter()
 
     def _refresh_plots(self):
         if not getattr(self.view, "plots", None):

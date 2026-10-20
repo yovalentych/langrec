@@ -4,6 +4,31 @@ What was done, in what order, and why. Newest entries first.
 
 ---
 
+## 2026-10-21 — 0.2.1: the simulator froze the interface
+
+**Report:** soon after starting the simulator the program became sluggish, clicks did nothing,
+and the window could hardly be closed.
+
+**Measured** (profiling `_tick` and a forced repaint, 1500×960 window):
+- the data work per tick was cheap: 1.3 ms at 1×, 3.8 ms at 60×;
+- **drawing** was not: 43 ms per frame at 1×, 113 ms at 60× — while the timer asked for a frame
+  every 33 ms. The event loop spent all its time painting; input (incl. closing) starved.
+  On a Retina screen there are 4× as many pixels, so it was worse still.
+
+**Cause:** antialiased curves with thousands of points per frame, redrawn at a fixed rate
+regardless of how long a frame takes.
+
+**Fix:**
+1. Signal curves are drawn without antialiasing (trends, which have few points, keep it).
+2. Drawing is decoupled from data: data, analysis and recording run every tick, but the plots
+   are redrawn synchronously and only if the previous redraw is old enough; the interval adapts
+   to 3× the measured drawing time (40–500 ms). Drawing thus uses at most ~1/3 of the time.
+
+**Result:** full-window paint 113 → 21 ms; on a real Retina screen, event latency median 2 ms,
+max 32 ms at 60×; no samples lost (235–240 k samples in 8 s at 60× × 500 Hz).
+
+---
+
 ## 2026-10-21 — 0.2.0: training simulator, bilingual UI, desktop redesign, filters, autoscale
 
 ### Training simulator (`langrec/sim/model.py`, `langrec/sources/simulator.py`)
