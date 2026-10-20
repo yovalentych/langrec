@@ -1,0 +1,26 @@
+[
+  {
+    "name": "CH00",
+    "role": "lvp",
+    "unit": "V",
+    "units_per_volt": 1.0,
+    "zero_v": 0.0,
+    "enabled": true
+  },
+  {
+    "name": "CH01",
+    "role": "perf",
+    "unit": "V",
+    "units_per_volt": 1.0,
+    "zero_v": 0.0,
+    "enabled": true
+  },
+  {
+    "name": "CH02",
+    "role": "dpdt",
+    "unit": "V",
+    "units_per_volt": 1.0,
+    "zero_v": 0.0,
+    "enabled": true
+  }
+]

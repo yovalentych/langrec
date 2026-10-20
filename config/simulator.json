@@ -1,0 +1,34 @@
+[
+  {
+    "name": "LVP",
+    "role": "lvp",
+    "unit": "mmHg",
+    "units_per_volt": 50.0,
+    "zero_v": 0.0,
+    "enabled": true
+  },
+  {
+    "name": "Perf",
+    "role": "perf",
+    "unit": "mmHg",
+    "units_per_volt": 50.0,
+    "zero_v": 0.0,
+    "enabled": true
+  },
+  {
+    "name": "Flow",
+    "role": "flow",
+    "unit": "ml/min",
+    "units_per_volt": 5.0,
+    "zero_v": 0.0,
+    "enabled": true
+  },
+  {
+    "name": "ECG",
+    "role": "ecg",
+    "unit": "mV",
+    "units_per_volt": 1.0,
+    "zero_v": 0.0,
+    "enabled": true
+  }
+]
