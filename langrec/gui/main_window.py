@@ -36,7 +36,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 from .. import __version__
 from ..analysis.filters import FilterBank, FilterConfig
 from ..analysis.hemodynamics import HemoParams, compute
-from ..channels import LEGACY_DEFAULT, ChannelConfig, simulator_channels
+from ..channels import LEGACY_DEFAULT, ChannelConfig, arduino_channels, simulator_channels
 from ..i18n import LANGUAGES, language, set_language, tr
 from ..io.ischemia_dat import find_recordings, parse_header
 from ..paths import default_sessions_dir, is_portable, make_settings
@@ -45,6 +45,7 @@ from ..sim.model import DRUGS, PROFILES
 from ..sources.base import DataSource
 from ..sources.replay import ReplaySource
 from ..sources.simulator import SimulatorSource
+from ..sources.arduino import ArduinoSource, list_ports
 from .channels_dialog import ChannelsDialog
 from .filters_dialog import FiltersDialog
 from .icon import make_icon
@@ -447,7 +448,8 @@ class MainWindow(QMainWindow):
         tabs = QHBoxLayout()
         tabs.setSpacing(0)
         self.mode_group = QButtonGroup(self)
-        for mode, key in (("replay", "src.tab_replay"), ("sim", "src.tab_sim")):
+        for mode, key in (("replay", "src.tab_replay"), ("sim", "src.tab_sim"),
+                          ("arduino", "src.tab_arduino")):
             b = QPushButton(tr(key))
             b.setObjectName("seg")
             b.setCheckable(True)
@@ -525,6 +527,35 @@ class MainWindow(QMainWindow):
         l1.setColumnStretch(1, 1)
         l1.setRowStretch(6, 1)
         self.src_stack.addWidget(p1)
+
+        # --- page 2: Arduino prototype
+        p2 = QWidget()
+        l2 = QGridLayout(p2)
+        l2.setContentsMargins(0, 0, 0, 0)
+        l2.setVerticalSpacing(7)
+        l2.addWidget(hint_label(tr("ard.info")), 0, 0, 1, 3)
+        l2.addWidget(QLabel(tr("ard.port")), 1, 0)
+        self.port_box = QComboBox()
+        self.port_box.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.port_box.setMinimumContentsLength(10)
+        l2.addWidget(self.port_box, 1, 1)
+        b = QPushButton("⟳")
+        b.setFixedWidth(32)
+        b.setToolTip(tr("ard.refresh"))
+        b.clicked.connect(self._refresh_ports)
+        l2.addWidget(b, 1, 2)
+        b4 = QPushButton(tr("ard.connect"))
+        b4.setObjectName("primary")
+        b4.clicked.connect(self._start_arduino)
+        l2.addWidget(b4, 2, 0, 1, 3)
+        b5 = QPushButton(tr("ard.buzzer"))
+        b5.setToolTip(tr("tip.ard_buzzer"))
+        b5.clicked.connect(lambda: isinstance(self.source, ArduinoSource) and self.source.send(b"b"))
+        l2.addWidget(b5, 3, 0, 1, 3)
+        l2.setColumnStretch(1, 1)
+        l2.setRowStretch(4, 1)
+        self.src_stack.addWidget(p2)
+        self._refresh_ports()
         lay.addWidget(self.src_stack)
         lay.addStretch()
         QTimer.singleShot(0, lambda: self._set_src_mode(self.src_mode))
@@ -748,6 +779,8 @@ class MainWindow(QMainWindow):
         elif isinstance(s, SimulatorSource):
             self.src_label.setText(tr("src.loaded_sim", profile=tr(f"profile.{s.profile}"),
                                       seed=s.model.seed, rate=s.rate))
+        elif isinstance(s, ArduinoSource):
+            self.src_label.setText(tr("src.loaded_ard", port=s.port, rate=s.rate))
         self.src_label.setVisible(s is not None)
 
     def _update_channel_summary(self):
@@ -816,7 +849,10 @@ class MainWindow(QMainWindow):
         elif not self.source:
             key, bg = "pill.nodata", th.muted
         elif self.running:
-            key, bg = ("pill.sim", th.success) if self.sim else ("pill.replay", th.warn)
+            if isinstance(self.source, ArduinoSource):
+                key, bg = "pill.live", th.success
+            else:
+                key, bg = ("pill.sim", th.success) if self.sim else ("pill.replay", th.warn)
         else:
             key, bg = "pill.paused", th.muted
         self.status_lamp.setText(tr(key))
@@ -828,7 +864,7 @@ class MainWindow(QMainWindow):
         self.settings.setValue("src_mode", mode)
         for b in self.mode_group.buttons():
             b.setChecked(b.property("mode") == mode)
-        idx = 0 if mode == "replay" else 1
+        idx = {"replay": 0, "sim": 1, "arduino": 2}.get(mode, 0)
         self.src_stack.setCurrentIndex(idx)
         # a stacked widget is as tall as its tallest page; let hidden pages take no space
         for i in range(self.src_stack.count()):
@@ -896,10 +932,43 @@ class MainWindow(QMainWindow):
         self._set_source(src)
         self._start()
 
+    def _refresh_ports(self):
+        cur = self.port_box.currentData()
+        self.port_box.clear()
+        for dev, desc in list_ports():
+            self.port_box.addItem(f"{dev}  {desc}", dev)
+        if not self.port_box.count():
+            self.port_box.addItem(tr("ard.no_ports"), None)
+        i = self.port_box.findData(cur)
+        if i >= 0:
+            self.port_box.setCurrentIndex(i)
+
+    def _start_arduino(self):
+        port = self.port_box.currentData()
+        if not port:
+            self._refresh_ports()
+            port = self.port_box.currentData()
+        if not port:
+            QMessageBox.information(self, "Arduino", tr("ard.no_ports"))
+            return
+        src = ArduinoSource(port)
+        try:
+            src.start()
+        except Exception as e:
+            QMessageBox.warning(self, "Arduino", tr("ard.open_fail", e=e))
+            return
+        self.channels = arduino_channels()
+        self.filter_cfgs = [FilterConfig() for _ in self.channels]
+        self._set_source(src)
+        self._start()
+
     def _set_source(self, src: DataSource):
         self._stop()
         if self.recorder:
             self.b_rec.setChecked(False)
+        old = self.source
+        if old is not None and old is not src and hasattr(old, "close"):
+            old.close()
         self.source = src
         self.baseline = None
         self.base_info = ("base.none", {})
@@ -1357,4 +1426,6 @@ class MainWindow(QMainWindow):
     def closeEvent(self, ev):
         if self.recorder:
             self.recorder.close()
+        if hasattr(self.source, "close"):
+            self.source.close()
         super().closeEvent(ev)

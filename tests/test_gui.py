@@ -98,3 +98,27 @@ def test_simulator_session_with_filters(app, tmp_path):
     assert "display_filters" in (session / "session.json").read_text(encoding="utf-8")
     w._show_summary = lambda: None
     w.close()
+
+
+def test_arduino_source_in_gui(app, tmp_path):
+    from test_arduino import FakeSerial
+    from langrec.gui.main_window import MainWindow
+    from langrec.sources.arduino import ArduinoSource
+    import time
+
+    w = MainWindow()
+    w._set_src_mode("arduino")
+    assert w.src_stack.currentIndex() == 2
+    fake = FakeSerial()
+    src = ArduinoSource("fake", serial_factory=lambda: fake)
+    src.start()
+    from langrec.channels import arduino_channels
+    w.channels = arduino_channels()
+    w._set_source(src)
+    w._start()
+    for _ in range(20):
+        time.sleep(0.05)
+        w._tick()
+    assert w.n > 300 and w.status_lamp.text() in ("НАЖИВО", "LIVE")
+    w.close()
+    assert fake.closed

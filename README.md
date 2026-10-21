@@ -30,6 +30,8 @@ haemodynamics, baseline-relative readouts, digital filters, and a virtual heart 
 - **Autoscale** that does not jump with every beat; drag a Y axis for manual scale, double-click to return.
 - **Recording** to plain CSV (+ JSON session description) that opens in anything.
 - **Calibration**: linear V → units per channel, two-point calibration helper.
+- **Arduino prototype source**: an Arduino Uno streams 4 channels at 500 Hz over USB; the bundled
+  firmware also generates a beating "heart" on a breadboard ([docs/ARDUINO_PROTOTYPE.md](docs/ARDUINO_PROTOTYPE.md)).
 - Light and dark themes; Ukrainian and English interface, switchable on the fly.
 
 Not yet: acquisition from a real ADC board. The interface is ready for it — see
@@ -111,6 +113,7 @@ python build_app.py                       # portable build for this OS → dist/
 - [docs/DAT_FORMAT.md](docs/DAT_FORMAT.md) — the legacy ISCHEMIA file format
 - [docs/HARDWARE.md](docs/HARDWARE.md) — choosing a modern ADC board
 - [docs/LEGACY_BOARD.md](docs/LEGACY_BOARD.md) — the original 1988 ISA ADC board and what it did
+- [docs/ARDUINO_PROTOTYPE.md](docs/ARDUINO_PROTOTYPE.md) — a heart on a breadboard: Arduino Uno as a 4-channel 500 Hz source
 - [docs/DEVLOG.md](docs/DEVLOG.md) — development log: what was done, when and why
 
 ## Licence

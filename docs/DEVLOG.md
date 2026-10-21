@@ -4,6 +4,23 @@ What was done, in what order, and why. Newest entries first.
 
 ---
 
+## 2026-10-22 — 0.3.0: Arduino prototype source
+
+- Goal: try the live chain at home with an Arduino Uno kit before buying a DAQ.
+- `firmware/langrec_arduino/`: the Uno generates an LV-pressure-like waveform as 62.5 kHz PWM
+  (Timer1) that a 2 × RC filter on the breadboard turns into an analogue curve; a knob sets
+  60–300 bpm, a button simulates ischemia; A0–A3 are sampled at 500 Hz (Timer2) and streamed as
+  11-byte frames with a checksum. First build failed to link: `tone()` uses Timer2's interrupt —
+  replaced by a plain buzzer pulse.
+- `langrec/sources/arduino.py`: `ArduinoSource` (pyserial, reader thread, resync, checksum) and
+  port discovery; GUI tab *Arduino* (port, connect, buzzer toggle), status "LIVE".
+- `docs/ARDUINO_PROTOTYPE.md` + an illustrated beginner's guide (Ukrainian) published as a page.
+- Wiring was checked against breadboard geometry before publishing; the first drawing put two
+  parts into rail positions that real boards do not have gaps at — fixed.
+- Tests: parser (split frames, garbage, bad checksum), threaded source with a fake port, GUI tab.
+
+---
+
 ## 2026-10-21 — docs: the original ADC board
 
 - docs/LEGACY_BOARD.md: identification of the original ISA board from a photo — a ~1988 Soviet

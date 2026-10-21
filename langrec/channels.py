@@ -48,6 +48,16 @@ def simulator_channels(calibrated: bool = True) -> list[ChannelConfig]:
     return out
 
 
+def arduino_channels() -> list[ChannelConfig]:
+    """Arduino prototype: A0 = generated 'heart' curve, A1 = knob, A2 = light sensor (pulse)."""
+    return [
+        ChannelConfig("A0 heart", role="lvp", unit="V"),
+        ChannelConfig("A1 knob", role="other", unit="V"),
+        ChannelConfig("A2 light", role="other", unit="V"),
+        ChannelConfig("A3", role="other", unit="V", enabled=False),
+    ]
+
+
 def save_channels(chs: list[ChannelConfig], path: str | Path) -> None:
     Path(path).write_text(json.dumps([asdict(c) for c in chs], ensure_ascii=False, indent=2),
                           encoding="utf-8")
