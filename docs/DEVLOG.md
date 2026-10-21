@@ -4,6 +4,18 @@ What was done, in what order, and why. Newest entries first.
 
 ---
 
+## 2026-10-21 — docs: the original ADC board
+
+- docs/LEGACY_BOARD.md: identification of the original ISA board from a photo — a ~1988 Soviet
+  12-bit successive-approximation ADC (КР572ПА2 DACs, К155ИР17 SAR, likely К1100СК2
+  sample-and-hold, КР580ВИ53 timer, СП5-3В calibration trimmers), most likely DT2801-compatible.
+  Clarifies that it digitised signals, while ISCHEMIA did the processing. Recommends keeping its
+  cable to recover the rig's wiring for the new DAQ.
+- Photo cropped to the board, EXIF metadata removed before adding to the public repository.
+- Linked from README, HARDWARE.md and DAT_FORMAT.md.
+
+---
+
 ## 2026-10-21 — docs: hardware for live recording
 
 - README gained a *Hardware for live recording* section: what an ADC / USB DAQ is, the signal

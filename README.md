@@ -39,7 +39,7 @@ Not yet: acquisition from a real ADC board. The interface is ready for it — se
 Replay and the simulator need nothing but a computer. To record a **live** heart, the analogue
 signals from the rig have to be digitised by an **ADC** (analogue-to-digital converter) — today
 usually a small external **USB data-acquisition (DAQ) device**. It is the modern replacement
-for the ISA board (DT2801) that sat inside the old Windows 98 PC.
+for the ISA board that sat inside the old Windows 98 PC ([what that board was](docs/LEGACY_BOARD.md)).
 
 ```
 balloon in the LV ─► pressure transducer ─► bridge amplifier ─► USB DAQ (ADC) ─► USB ─► computer running LangRec
@@ -110,6 +110,7 @@ python build_app.py                       # portable build for this OS → dist/
 - [docs/SIMULATOR.md](docs/SIMULATOR.md) — the heart model, its data basis and limits
 - [docs/DAT_FORMAT.md](docs/DAT_FORMAT.md) — the legacy ISCHEMIA file format
 - [docs/HARDWARE.md](docs/HARDWARE.md) — choosing a modern ADC board
+- [docs/LEGACY_BOARD.md](docs/LEGACY_BOARD.md) — the original 1988 ISA ADC board and what it did
 - [docs/DEVLOG.md](docs/DEVLOG.md) — development log: what was done, when and why
 
 ## Licence

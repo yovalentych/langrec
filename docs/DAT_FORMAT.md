@@ -5,7 +5,8 @@ Implementation: `langrec/io/ischemia_dat.py`.
 
 ## Background
 - ISCHEMIA: a DOS program (Borland C++, 1991 runtime) built on the **STEMMER SWG "TL 4.0"**
-  library for a **Data Translation DT2801** board (12 bit, ±10.24 V).
+  library for a **Data Translation DT2801** board (12 bit, ±10.24 V); the board actually used
+  was a 1988 Soviet DT2801-compatible card ([LEGACY_BOARD.md](LEGACY_BOARD.md)).
 - Recordings are written to `C:\FILES\ISCHnnnn.DAT`; markers to `ISCHnnnn.MRK`.
 
 ## Header

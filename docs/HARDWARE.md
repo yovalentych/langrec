@@ -12,7 +12,8 @@ directly — an **analogue-to-digital converter (ADC)** measures it at fixed int
 to the software. A **data-acquisition device (DAQ)** is an ADC with several inputs, a clock and
 a USB (or Ethernet) interface in one box.
 
-The old setup used a DT2801 ISA card inside the PC: 12 bit, ±10.24 V, 3 channels at 100 Hz.
+The old setup used a DT2801-compatible ISA card inside the PC: 12 bit, ±10.24 V, 3 channels at
+100 Hz — see [LEGACY_BOARD.md](LEGACY_BOARD.md) for what it was and why its cable is worth keeping.
 Today the equivalent is an external USB DAQ that works with any laptop.
 
 ```
