@@ -3,6 +3,36 @@
 No decision yet (as of October 2026, not urgent). This page collects requirements and options
 so that nothing is forgotten when the time comes.
 
+## What an ADC / DAQ does
+A Langendorff rig produces **analogue voltages**: a pressure transducer connected to the LV
+balloon (or to the perfusion line) gives a few millivolts, a bridge amplifier scales that to a
+few volts, and so on for flow meters and ECG amplifiers. A computer cannot read a voltage
+directly — an **analogue-to-digital converter (ADC)** measures it at fixed intervals
+(the *sampling rate*) with a given precision (the *resolution*, in bits) and hands the numbers
+to the software. A **data-acquisition device (DAQ)** is an ADC with several inputs, a clock and
+a USB (or Ethernet) interface in one box.
+
+The old setup used a DT2801 ISA card inside the PC: 12 bit, ±10.24 V, 3 channels at 100 Hz.
+Today the equivalent is an external USB DAQ that works with any laptop.
+
+```
+transducer ─► amplifier (±10 V) ─► DAQ input ─┐
+transducer ─► amplifier (±10 V) ─► DAQ input ─┼─► USB ─► LangRec
+ECG / flow amplifier ─────────────► DAQ input ─┘
+```
+
+Terms worth knowing when comparing devices:
+- **Input range** — the voltage span an input accepts (±10 V here). A smaller range on a larger
+  signal clips it; a much larger range wastes resolution.
+- **Resolution** — 12 bit splits ±10 V into 4096 steps (≈5 mV), 16 bit into 65 536 (≈0.3 mV).
+- **Sampling rate** — per channel. Some devices quote the *total* rate shared by all channels.
+- **Single-ended vs differential** — single-ended inputs measure against a common ground;
+  differential inputs measure the difference between two wires and reject interference
+  (e.g. 50 Hz mains hum) much better. Prefer differential for small or long-cabled signals.
+- **Isolation** — not required for an isolated heart, but matters if the same device is ever
+  used with live animals.
+- **Drivers / API** — what operating systems and programming languages the vendor supports.
+
 ## Requirements
 | What | Minimum | Why |
 |---|---|---|

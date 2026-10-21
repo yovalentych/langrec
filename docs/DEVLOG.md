@@ -4,6 +4,17 @@ What was done, in what order, and why. Newest entries first.
 
 ---
 
+## 2026-10-21 — docs: hardware for live recording
+
+- README gained a *Hardware for live recording* section: what an ADC / USB DAQ is, the signal
+  chain (transducer → amplifier → DAQ → USB → LangRec), minimum requirements, typical devices
+  with approximate prices, and the current status (no device supported yet; one source module
+  needed once a device is chosen).
+- docs/HARDWARE.md: a general introduction to ADCs/DAQs and the terms to compare devices by
+  (input range, resolution, per-channel vs total sampling rate, single-ended vs differential, isolation, drivers).
+
+---
+
 ## 2026-10-21 — 0.2.1: the simulator froze the interface
 
 **Report:** soon after starting the simulator the program became sluggish, clicks did nothing,
