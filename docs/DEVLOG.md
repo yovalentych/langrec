@@ -12,6 +12,8 @@ What was done, in what order, and why. Newest entries first.
   needed once a device is chosen).
 - docs/HARDWARE.md: a general introduction to ADCs/DAQs and the terms to compare devices by
   (input range, resolution, per-channel vs total sampling rate, single-ended vs differential, isolation, drivers).
+- docs/HARDWARE.md: availability in Ukraine (web search, October 2026): Advantech at Proxis, NI at MOMM,
+  Analog Discovery 3 at RKS Components; LabJack and MCC only from abroad; avoid Russian L-Card.
 
 ---
 

@@ -57,6 +57,25 @@ Terms worth knowing when comparing devices:
 
 Prices are indicative; check current listings.
 
+## Availability in Ukraine (checked October 2026)
+Stock and prices change — confirm with the seller before ordering.
+
+| Device | Where | Notes |
+|---|---|---|
+| Advantech USB-4704 / USB-4702 | Proxis (proxis.ua), Kyiv | ±10 V; 4704: 14 bit, 48 kS/s total; 4702: 12 bit, 10 kS/s, ~6 500 UAH. Drivers: Windows, Linux — **no macOS** |
+| NI USB-6009 | MOMM (momm.com.ua) | ±10 V, 14 bit, 48 kS/s total. NI-DAQmx: Windows, Linux — **no macOS** |
+| Digilent Analog Discovery 3 | RKS Components / Radiomag (rcscomponents.kiev.ua), to order 14–30 days | only **2** analogue inputs (±25 V, 14 bit); Windows, macOS, Linux SDK — enough for LVP + perfusion pressure |
+| ICP DAS USB-2019 | Holit Data Systems (icpdas.com.ua), official ICP DAS distributor | universal slow input for temperature/thermocouples — **not suitable** for pressure waveforms |
+| LabJack T7 / T4 | no Ukrainian dealer found | order from the EU, e.g. PIMZOS (Poland, ~€550 for T7), or from labjack.com; add shipping and import VAT |
+| MCC USB-1608G | no Ukrainian dealer found | Digilent/MCC require an export form outside the US; some countries are excluded |
+| ADC breakout boards (ADS1015/ADS1115…) | arduino.ua, Kosmodrom | DIY only: need level shifting to ±10 V and firmware |
+
+Do **not** buy L-Card or other Russian-made devices (imports from Russia are prohibited, and
+spare parts, drivers and support are unavailable).
+
+Practical choice: **LabJack T7 from an EU seller** if macOS/Linux matter; a locally available
+**Advantech USB-4704** or **NI USB-6009** if the rig computer will run Windows.
+
 ## When a board is chosen
 1. Write a source class in `langrec/sources/` (see [ARCHITECTURE.md](ARCHITECTURE.md#adding-a-real-adc-board)).
 2. Calibrate transducers: apply known pressures (e.g. 0 and 100 mmHg from a manometer), use the
